@@ -1,0 +1,63 @@
+﻿@page
+@model QuizAppDemo.ResultModel
+@{
+    ViewData["Title"] = "Result";
+    var color = "red";
+}
+
+
+<div class="container border-info row p-0 m-0 ">
+
+    <div class="col-12 offset-10 mb-4">
+        <a asp-area="" asp-page="/Index">Back to Home Page</a>
+    </div>
+
+    <div class="col-12">
+        <h1 class="text-info text-center">Quiz Completed</h1>
+    </div>
+
+    @if (Model.ResultVM != null)
+    {
+
+
+        <div class="col-12">
+
+            @if (Model.ResultVM.CandidateScore <= 50)
+            {
+                color = "red";
+            }
+            else if (Model.ResultVM.CandidateScore >= 70)
+            {
+                color = "green";
+            }else
+            {
+                color = "blue";
+            }
+
+            <div class="card-body card-setting">
+                <div class="circle-@color text-center">
+                    @{
+                        double percentage = Math.Round((Model.ResultVM.CandidateScore * 100) / Model.ResultVM.TotalScore);
+                    }
+                    <a class="text-result text-white ml-1">@percentage%</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row col-12 mt-5">
+            <div class="col-6 offset-2">
+                <h5> YOUR SCORE : <a class="text-info score-size"> @Model.ResultVM.CandidateScore </a></h5>
+            </div>
+            <div class="col-3 ">
+                <h5> TOTAL SCORE : <a class="text-info score-size"> @Model.ResultVM.TotalScore </a></h5>
+            </div>
+        </div>
+    }
+
+
+
+
+</div>
+
+
+

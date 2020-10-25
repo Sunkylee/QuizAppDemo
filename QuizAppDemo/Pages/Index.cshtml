@@ -1,0 +1,145 @@
+﻿@page
+@model QuizAppDemo.IndexModel
+@using Microsoft.Extensions.Options
+@inject IOptions<QuizAppDemo.DataAccess.Utility.Constants> MaximumQuestion
+@{
+    ViewData["Title"] = "Home";
+    var status = "Completed";
+    var textStyle = "text-info";
+    var btnAction = "Continue";
+    int MaxQuestion = MaximumQuestion.Value.MaximumNumber;
+}
+
+
+<br />
+
+
+<div class="container row p-0 m-0 ">
+
+    <div class="col-9">
+        <h2 class="text-info"> Select a quiz type to begin</h2>
+
+    </div>
+    <div class="col-3">
+
+
+        <a  class="btn btn-outline-info text-info" style="font-weight:800" data-toggle="modal" data-target="#testGuide">
+            Test Guide
+        </a>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="testGuide" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Basic Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        To refresh or initiate a new test, please ensure that existing record of the user is cleared.                       
+                        <br/>
+                        <b> UserActivities</b>
+                        <br />
+                        <b> UserProgress </b>
+                    </p>
+                    <p>
+                        A backup for database and associated scripts has been attached to the link/email in my response
+                    </p>
+                    <p>
+                        As regards questions with multiple answers, user must select ALL correct options to get a score.
+                        for example, if there are three correct options and user select two, the score for the question will be 0.
+                    </p>
+                    <p>
+                        Kind Regards,
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class=" row col-12  border p-2 mt-5 " style="height:200px">
+        @if (Model.UserVM != null)
+        {
+
+            foreach (var item in Model.UserVM.Quizzes)
+            {
+                <div class="col-6 ">
+                    <form method="post">
+
+                        @Html.HiddenFor(Model => Model.UserVM.UserId)
+
+                        <div class="card mt-3" style="height:150px">
+
+                            <div class=" row card-body">
+                                <div class="col-8">
+
+                                    <h5 class="card-title"> @item.Name </h5>
+                                    @{
+                                        int count = Model.UserVM.Activities.Where(x => x.QuizId == item.Id)
+                                                                           .Select(x => x.Count).FirstOrDefault();
+
+                                        double percentage = Math.Round((Convert.ToDouble(count) * 100) / MaxQuestion);
+                                    }
+
+                                    @switch (count)
+                                    {
+                                        case 0:
+                                            status = "Not Started";
+                                            textStyle = "text-danger";
+                                            btnAction = "Start Quiz";
+                                            break;
+                                        case 10:
+                                            status = "Completed";
+                                            textStyle = "text-success";
+                                            btnAction = "Check Result";
+                                            break;
+                                        default:
+                                            status = "In progress";
+                                            textStyle = "text-info";
+                                            btnAction = "Continue >>";
+                                            break;
+                                    }
+                                    <div class="row">
+                                        <h6 class="ml-3"> Status : <a class="@textStyle"> @status</a></h6>
+                                    </div>
+
+                                </div>
+                                <div class="col-4">
+                                    <button type="submit" class="btn btn-primary" asp-route-quizId="@item.Id">@btnAction</button>
+                                </div>
+                                <div class="col-12">
+                                    @if (count.Equals(0))
+                                    {
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="@MaxQuestion"></div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width: @percentage%" aria-valuenow="@count" aria-valuemin="0" aria-valuemax="@MaxQuestion"></div>
+                                        </div>
+                                    }
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            }
+
+        }
+
+    </div>
+
+
+</div>
